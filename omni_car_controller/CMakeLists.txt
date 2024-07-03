@@ -47,7 +47,12 @@ pluginlib_export_plugin_description_file(controller_interface omni_car_controlle
 # INSTALL
 install(
   DIRECTORY include/
-  DESTINATION include/omni_car_controller
+  DESTINATION include/${PROJECT_NAME}
+)
+
+install(DIRECTORY
+  config
+  DESTINATION share/${PROJECT_NAME}
 )
 
 install(TARGETS omni_car_controller

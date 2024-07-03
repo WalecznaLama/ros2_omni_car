@@ -57,7 +57,9 @@ public:
   controller_interface::CallbackReturn on_shutdown(const rclcpp_lifecycle::State & previous_state) override;
 
 protected:
-  double wheel_radius_, wheel_base_, wheel_track_, control_frequency_;  // parameters
+  bool get_parameters();
+
+  double wheel_radius_, wheel_base_, wheel_track_;  // parameters
   std::vector<std::string> joint_names_;
   std::vector<std::string> command_interface_types_;
   std::vector<std::string> state_interface_types_;

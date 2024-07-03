@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 
+#include "rclcpp/rclcpp.hpp"
 #include "rclcpp/qos.hpp"
 #include "rclcpp/time.hpp"
 #include "rclcpp_lifecycle/node_interfaces/lifecycle_node_interface.hpp"
@@ -21,7 +22,6 @@ controller_interface::CallbackReturn RobotController::on_init() {
   joint_names_ = auto_declare<std::vector<std::string>>("joints", joint_names_);
   command_interface_types_ = auto_declare<std::vector<std::string>>("command_interfaces", command_interface_types_);
   state_interface_types_ = auto_declare<std::vector<std::string>>("state_interfaces", state_interface_types_);
-
 
   return CallbackReturn::SUCCESS;
 }
@@ -47,7 +47,8 @@ controller_interface::InterfaceConfiguration RobotController::state_interface_co
 }
 
 controller_interface::CallbackReturn RobotController::on_configure(const rclcpp_lifecycle::State &) {
-    // TODO Parameters read here
+  if (!get_parameters()) return CallbackReturn::ERROR;
+    
   auto callback = [this](const std::shared_ptr<geometry_msgs::msg::Twist> cmd_vel_msg) -> void {
     cmd_vel_ptr_.writeFromNonRT(cmd_vel_msg);
     new_msg_ = true;
@@ -72,23 +73,33 @@ controller_interface::CallbackReturn RobotController::on_activate(const rclcpp_l
   return CallbackReturn::SUCCESS;
 }
 
-
-controller_interface::return_type RobotController::update( const rclcpp::Time & time, const rclcpp::Duration & /*period*/) {
-  if (new_msg_) {
-    cmd_vel_msg_ = *cmd_vel_ptr_.readFromRT();
-    start_time_ = time;
-    new_msg_ = false;
-  }
-
-  if (cmd_vel_msg_ != nullptr) {
-    // TODO
-
-    for (size_t i = 0; i < joint_velocity_command_interface_.size(); i++) {
-      joint_velocity_command_interface_[i].get().set_value(0.0); /* TODO */
+controller_interface::return_type RobotController::update(const rclcpp::Time & time, const rclcpp::Duration & /*period*/) {
+    if (new_msg_) {
+        cmd_vel_msg_ = *cmd_vel_ptr_.readFromRT();
+        start_time_ = time;
+        new_msg_ = false;
     }
-  }
 
-  return controller_interface::return_type::OK;
+    if (cmd_vel_msg_ != nullptr) {
+        double vx = cmd_vel_msg_->linear.x;
+        double vy = cmd_vel_msg_->linear.y;
+        double omega = cmd_vel_msg_->angular.z;
+
+        // Calculate wheel velocities for mecanum drive
+        double wheel_radius_inverse = 1.0 / wheel_radius_;
+        double front_left_velocity = (vx - vy - (wheel_base_ + wheel_track_) * omega) * wheel_radius_inverse;
+        double front_right_velocity = (vx + vy + (wheel_base_ + wheel_track_) * omega) * wheel_radius_inverse;
+        double rear_left_velocity = (vx + vy - (wheel_base_ + wheel_track_) * omega) * wheel_radius_inverse;
+        double rear_right_velocity = (vx - vy + (wheel_base_ + wheel_track_) * omega) * wheel_radius_inverse;
+
+        // Joints are ordered as [front_left, front_right, rear_left, rear_right]
+        joint_velocity_command_interface_[0].get().set_value(front_left_velocity);
+        joint_velocity_command_interface_[1].get().set_value(front_right_velocity);
+        joint_velocity_command_interface_[2].get().set_value(rear_left_velocity);
+        joint_velocity_command_interface_[3].get().set_value(rear_right_velocity);
+    }
+
+    return controller_interface::return_type::OK;
 }
 
 controller_interface::CallbackReturn RobotController::on_deactivate(const rclcpp_lifecycle::State &) {
@@ -101,6 +112,25 @@ controller_interface::CallbackReturn RobotController::on_cleanup(const rclcpp_li
 controller_interface::CallbackReturn RobotController::on_error(const rclcpp_lifecycle::State &) { return CallbackReturn::SUCCESS; }
 
 controller_interface::CallbackReturn RobotController::on_shutdown(const rclcpp_lifecycle::State &) { return CallbackReturn::SUCCESS; }
+
+bool RobotController::get_parameters() {
+    auto node = this->get_node(); // Get the underlying node handle
+    bool success = true;
+
+    success &= node->get_parameter("wheel_radius", wheel_radius_);
+    success &= node->get_parameter("wheel_base", wheel_base_);
+    success &= node->get_parameter("wheel_track", wheel_track_);
+    
+    if (!success) {
+        RCLCPP_ERROR(node->get_logger(), "Failed to get parameters.");
+        return false;
+    }
+    
+    RCLCPP_INFO(node->get_logger(), "Loaded parameters: wheel_radius=%f, wheel_base=%f, wheel_track=%f",
+                                    wheel_radius_, wheel_base_, wheel_track_);
+    return true;
+}
+
 }  // namespace omni_car
 
 #include "pluginlib/class_list_macros.hpp"

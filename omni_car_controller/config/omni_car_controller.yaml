@@ -1,6 +1,0 @@
-omni_car_controller:
-  ros__parameters:
-    wheel_radius: 0.06  # Radius of the wheel in meters
-    wheel_base: 0.15    # Distance between left and right wheels
-    wheel_track: 0.2   # Distance between front and back wheels
-    control_frequency: 50.0  # Frequency in Hz at which the controller runs
