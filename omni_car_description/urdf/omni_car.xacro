@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<robot name="omni_car" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:include filename="$(find omni_car_description)/urdf/wheel.xacro"/>
+  <!-- <xacro:include filename="$(find omni_car_description)/urdf/omni_car.gazebo"/> -->
+
+  <link name="base_link"/>
+
+  <link name="frame">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <mass value="2.0" />
+      <inertia ixx="0.02" ixy="0.0" ixz="0.0" iyy="0.02" iyz="0.0" izz="0.02" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="file://$(find omni_car_description)/meshes/base_link.dae" />
+      </geometry>
+      <material name="">
+        <color rgba="0.0 0.2 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <box size="0.23 0.13 0.01"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="base_to_frame" type="fixed">
+    <parent link="base_link"/>
+    <child link="frame"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+  
+  <xacro:property name="wheel_x_offset" value="0.081"/>
+  <xacro:property name="wheel_y_offset" value="0.098"/>
+  <xacro:property name="wheel_z_offset" value="-0.02"/>
+  <xacro:wheel wheel_name="front_left" is_right="false" wheel_x_offset="${wheel_x_offset}" wheel_y_offset="${wheel_y_offset}" wheel_z_offset="${wheel_z_offset}"/>
+  <xacro:wheel wheel_name="front_right" is_right="true" wheel_x_offset="${wheel_x_offset}" wheel_y_offset="${-wheel_y_offset}" wheel_z_offset="${wheel_z_offset}"/>
+  <xacro:wheel wheel_name="rear_left" is_right="false" wheel_x_offset="${-wheel_x_offset}" wheel_y_offset="${wheel_y_offset}" wheel_z_offset="${wheel_z_offset}"/>
+  <xacro:wheel wheel_name="rear_right" is_right="true" wheel_x_offset="${-wheel_x_offset}" wheel_y_offset="${-wheel_y_offset}" wheel_z_offset="${wheel_z_offset}"/>
+</robot>

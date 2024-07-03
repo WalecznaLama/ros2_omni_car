@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<robot>
+  <gazebo>
+    <plugin name="gazebo_ros2_control" filename="libgazebo_ros2_control.so">
+      <robotNamespace>/omni_car</robotNamespace>
+    </plugin>
+  </gazebo>
+</robot>
