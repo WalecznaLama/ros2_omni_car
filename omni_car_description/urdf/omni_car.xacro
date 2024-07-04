@@ -41,4 +41,28 @@
   <xacro:wheel wheel_name="front_right" is_right="true" wheel_x_offset="${wheel_x_offset}" wheel_y_offset="${-wheel_y_offset}" wheel_z_offset="${wheel_z_offset}"/>
   <xacro:wheel wheel_name="rear_left" is_right="false" wheel_x_offset="${-wheel_x_offset}" wheel_y_offset="${wheel_y_offset}" wheel_z_offset="${wheel_z_offset}"/>
   <xacro:wheel wheel_name="rear_right" is_right="true" wheel_x_offset="${-wheel_x_offset}" wheel_y_offset="${-wheel_y_offset}" wheel_z_offset="${wheel_z_offset}"/>
+
+  <!-- Main ROS2 control configuration -->
+  <ros2_control name="omni_car" type="system">
+    <hardware>
+      <plugin>gazebo_ros2_control/GazeboSystem</plugin>
+    </hardware>
+    <joint name="wheel_front_left_joint">
+      <command_interface name="velocity"/>
+      <state_interface name="velocity"/>
+    </joint>
+    <joint name="wheel_front_right_joint">
+      <command_interface name="velocity"/>
+      <state_interface name="velocity"/>
+    </joint>
+    <joint name="wheel_rear_left_joint">
+      <command_interface name="velocity"/>
+      <state_interface name="velocity"/>
+    </joint>
+    <joint name="wheel_rear_right_joint">
+      <command_interface name="velocity"/>
+      <state_interface name="velocity"/>
+    </joint>
+  </ros2_control>
+
 </robot>

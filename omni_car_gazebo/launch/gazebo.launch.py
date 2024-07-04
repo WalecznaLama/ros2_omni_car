@@ -34,7 +34,7 @@ def generate_launch_description():
 
         # Start Gazebo server with the specified world file
         ExecuteProcess(
-            cmd=['gazebo', '--verbose', world, '-s', 'libgazebo_ros_factory.so'],
+            cmd=['gazebo', '--verbose', world , '-s', 'libgazebo_ros_factory.so'],
             output='screen'),
 
         # Node to publish the robot state to the ROS 2 ecosystem

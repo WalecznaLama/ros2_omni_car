@@ -8,7 +8,6 @@ controller_manager:
     omni_car_controller:
       type: omni_car_controller/RobotController
 
-
 omni_car_controller:
   ros__parameters:
     joints:  # [front_left, front_right, rear_left, rear_right]
@@ -25,4 +24,4 @@ omni_car_controller:
 
     wheel_radius: 0.06  # Radius of the wheel in meters
     wheel_base: 0.15    # Distance between left and right wheels
-    wheel_track: 0.2   # Distance between front and back wheels
+    wheel_track: 0.2    # Distance between front and back wheels

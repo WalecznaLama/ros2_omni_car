@@ -1,4 +1,3 @@
-
 cmake_minimum_required(VERSION 3.8)
 project(omni_car_controller)
 
@@ -7,7 +6,7 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
-# find dependencies
+# Find dependencies
 set(THIS_PACKAGE_INCLUDE_DEPENDS
   rclcpp
   rclcpp_lifecycle
@@ -44,15 +43,10 @@ ament_target_dependencies(
 # Export controllers
 pluginlib_export_plugin_description_file(controller_interface omni_car_controller.xml)
 
-# INSTALL
+# Install
 install(
   DIRECTORY include/
   DESTINATION include/${PROJECT_NAME}
-)
-
-install(DIRECTORY
-  config
-  DESTINATION share/${PROJECT_NAME}
 )
 
 install(TARGETS omni_car_controller
@@ -74,7 +68,7 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
-# EXPORTS
+# Exports
 ament_export_targets(export_omni_car_controller HAS_LIBRARY_TARGET)
 ament_export_dependencies(${THIS_PACKAGE_INCLUDE_DEPENDS})
 ament_package()
