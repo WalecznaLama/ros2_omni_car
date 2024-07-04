@@ -6,7 +6,7 @@ controller_manager:
       type: joint_state_broadcaster/JointStateBroadcaster
 
     omni_car_controller:
-      type: omni_car_controller/RobotController
+      type: omni_car/RobotController
 
 omni_car_controller:
   ros__parameters:

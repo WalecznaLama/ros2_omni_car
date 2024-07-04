@@ -1,6 +1,6 @@
-<library path="omni_car_controller">
-  <class name="omni_car_controller/RobotController"
-         type="omni_car_controller::RobotController"
+<library path="omni_car">
+  <class name="omni_car/RobotController"
+         type="omni_car::RobotController"
          base_class_type="controller_interface::ControllerInterface">
     <description>
       Robot controller plugin for omni_car robot.

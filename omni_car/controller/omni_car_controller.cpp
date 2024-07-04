@@ -1,4 +1,4 @@
-#include "omni_car_controller/omni_car_controller.hpp"
+#include "omni_car/omni_car_controller.hpp"
 
 #include <stddef.h>
 #include <algorithm>
@@ -135,5 +135,4 @@ bool RobotController::get_parameters() {
 
 #include "pluginlib/class_list_macros.hpp"
 
-PLUGINLIB_EXPORT_CLASS(
-  omni_car::RobotController, controller_interface::ControllerInterface)
+PLUGINLIB_EXPORT_CLASS(omni_car::RobotController, controller_interface::ControllerInterface)
