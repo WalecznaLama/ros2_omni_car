@@ -59,13 +59,13 @@ def generate_launch_description():
     )
     robot_description = {"robot_description": robot_description_content}
 
-    robot_controllers = PathJoinSubstitution(
-        [
-            FindPackageShare("omni_car"),
-            "config",
-            "omni_car_controllers.yaml",
-        ]
-    )
+    # robot_controllers = PathJoinSubstitution(
+    #     [
+    #         FindPackageShare("omni_car"),
+    #         "config",
+    #         "omni_car_controllers.yaml",
+    #     ]
+    # )
 
     rviz_config_file = PathJoinSubstitution(
         [FindPackageShare("omni_car"), "rviz", "rviz.rviz"]
