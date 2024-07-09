@@ -36,12 +36,12 @@
   </joint>
   
   <xacro:property name="wheel_x_offset" value="0.081"/>
-  <xacro:property name="wheel_y_offset" value="0.098"/>
+  <xacro:property name="wheel_y_offset" value="0.081"/>
   <xacro:property name="wheel_z_offset" value="-0.02"/>
-  <xacro:wheel wheel_name="front_left" is_right="false" wheel_x_offset="${wheel_x_offset}" wheel_y_offset="${wheel_y_offset}" wheel_z_offset="${wheel_z_offset}" prefix="${prefix}"/>
-  <xacro:wheel wheel_name="front_right" is_right="true" wheel_x_offset="${wheel_x_offset}" wheel_y_offset="${-wheel_y_offset}" wheel_z_offset="${wheel_z_offset}" prefix="${prefix}"/>
-  <xacro:wheel wheel_name="rear_left" is_right="false" wheel_x_offset="${-wheel_x_offset}" wheel_y_offset="${wheel_y_offset}" wheel_z_offset="${wheel_z_offset}" prefix="${prefix}"/>
-  <xacro:wheel wheel_name="rear_right" is_right="true" wheel_x_offset="${-wheel_x_offset}" wheel_y_offset="${-wheel_y_offset}" wheel_z_offset="${wheel_z_offset}" prefix="${prefix}"/>
+  <xacro:wheel wheel_name="front_left" is_right="false" is_front="true" wheel_x_offset="${wheel_x_offset}" wheel_y_offset="${wheel_y_offset}" wheel_z_offset="${wheel_z_offset}" prefix="${prefix}"/>
+  <xacro:wheel wheel_name="front_right" is_right="true" is_front="true" wheel_x_offset="${wheel_x_offset}" wheel_y_offset="${-wheel_y_offset}" wheel_z_offset="${wheel_z_offset}" prefix="${prefix}"/>
+  <xacro:wheel wheel_name="rear_left" is_right="false" is_front="false" wheel_x_offset="${-wheel_x_offset}" wheel_y_offset="${wheel_y_offset}" wheel_z_offset="${wheel_z_offset}" prefix="${prefix}"/>
+  <xacro:wheel wheel_name="rear_right" is_right="true" is_front="false" wheel_x_offset="${-wheel_x_offset}" wheel_y_offset="${-wheel_y_offset}" wheel_z_offset="${wheel_z_offset}" prefix="${prefix}"/>
 
   </xacro:macro>
 

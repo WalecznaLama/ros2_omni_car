@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://wiki.ros.org/xacro">
-    <xacro:macro name="wheel" params="wheel_name is_right wheel_x_offset wheel_y_offset wheel_z_offset prefix">
+    <xacro:macro name="wheel" params="wheel_name is_right is_front wheel_x_offset wheel_y_offset wheel_z_offset prefix">
         <link name="${prefix}wheel_${wheel_name}">
             <inertial>
                 <origin xyz="0 0 0" rpy="0 0 0" />
@@ -8,13 +8,16 @@
                 <inertia ixx="0.02" ixy="0.0" ixz="0.0" iyy="0.02" iyz="0.0" izz="0.02" />
             </inertial>
             <visual>
-                <origin xyz="0 0 0" rpy="0 0 0" />
+                <origin xyz="0 0 0" rpy="${-pi/2} 0 0" />
                 <geometry>
-                    <xacro:if value="${is_right}">
-                        <mesh filename="file://$(find omni_car)/meshes/wheel_r.dae" />
+                    <!-- <xacro:if value="${is_right}"> -->
+                    <xacro:if value="${(is_right and is_front) or (not is_right and not is_front)}">
+
+                        <mesh filename="file://$(find omni_car)/meshes/wheel_set2.dae" />
                     </xacro:if>
-                    <xacro:unless value="${is_right}">
-                        <mesh filename="file://$(find omni_car)/meshes/wheel_l.dae" />
+                    <!-- <xacro:unless value="${is_right}"> -->
+                    <xacro:unless value="${(is_right and is_front) or (not is_right and not is_front)}">
+                        <mesh filename="file://$(find omni_car)/meshes/wheel_set1.dae" />
                     </xacro:unless>
                 </geometry>
                 <material name="yellow"/>
@@ -37,14 +40,14 @@
             <visual>
                 <origin xyz="0 0 0" rpy="0 0 0" />
                 <geometry>
-                    <!-- <cylinder radius="0.0001" length="0.0001"/> -->
-                    <cylinder radius="0.03" length="0.05"/>
+                    <cylinder radius="0.0001" length="0.0001"/>
+                    <!-- <cylinder radius="0.03" length="0.02"/> -->
                 </geometry>
             </visual>
             <collision>
                 <origin xyz="0 0 0" rpy="0 0 0" />
                 <geometry>
-                    <cylinder radius="0.03" length="0.05"/>
+                    <cylinder radius="0.03" length="0.02"/>
                 </geometry>
             </collision>
         </link>
@@ -60,11 +63,11 @@
         <joint name="${prefix}wheel_${wheel_name}_joint_force_transform" type="continuous">
             <parent link="${prefix}frame"/>
             <child link="${prefix}wheel_${wheel_name}_force_transform"/>
-            <xacro:if value="${is_right}">
+            <xacro:if value="${(is_right and is_front) or (not is_right and not is_front)}">
                 <origin xyz="${wheel_x_offset} ${wheel_y_offset} ${wheel_z_offset}" rpy="${-pi/2} 0 ${pi/4}"/> <!-- 45 deg rotate -->
             </xacro:if>
-            <xacro:unless value="${is_right}">
-                <origin xyz="${wheel_x_offset} ${wheel_y_offset} ${wheel_z_offset}" rpy="${-pi/2} 0 ${-pi/4}"/> <!-- 45 deg rotate -->
+            <xacro:unless value="${(is_right and is_front) or (not is_right and not is_front)}">
+                <origin xyz="${wheel_x_offset} ${wheel_y_offset} ${wheel_z_offset}" rpy="${-pi/2} 0 ${-pi/4}"/> <!-- -45 deg rotate -->
             </xacro:unless>
             <axis xyz="0 0 1"/>
             <mimic joint="${prefix}wheel_${wheel_name}_joint" multiplier="1.0"/>
