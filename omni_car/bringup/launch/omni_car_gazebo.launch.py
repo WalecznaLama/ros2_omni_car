@@ -59,14 +59,6 @@ def generate_launch_description():
     )
     robot_description = {"robot_description": robot_description_content}
 
-    # robot_controllers = PathJoinSubstitution(
-    #     [
-    #         FindPackageShare("omni_car"),
-    #         "config",
-    #         "omni_car_controllers.yaml",
-    #     ]
-    # )
-
     rviz_config_file = PathJoinSubstitution(
         [FindPackageShare("omni_car"), "rviz", "rviz.rviz"]
     )
@@ -77,16 +69,6 @@ def generate_launch_description():
         output="screen",
         parameters=[robot_description],
     )
-
-    # control_node = Node(
-    #     package="controller_manager",
-    #     executable="ros2_control_node",
-    #     parameters=[robot_controllers],
-    #     remappings=[
-    #         ("~/robot_description", "/robot_description"),
-    #     ],
-    #     output="both",
-    # )
 
     joint_state_broadcaster_spawner = Node(
         package="controller_manager",
@@ -112,7 +94,6 @@ def generate_launch_description():
         gazebo,
         node_robot_state_publisher,
         gz_spawn_entity,
-        # control_node,
         joint_state_broadcaster_spawner,
         robot_controller_spawner,
         rviz_node,

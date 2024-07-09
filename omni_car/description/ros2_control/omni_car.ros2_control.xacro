@@ -4,7 +4,7 @@
   <xacro:macro name="omni_car_ros2_control" params="name prefix">
     <ros2_control name="${name}" type="system">
       <hardware>
-        <plugin>ign_ros2_control/IgnitionSimSystem</plugin>
+        <plugin>gz_ros2_control/GazeboSimSystem</plugin>
       </hardware>
 
       <joint name="${prefix}wheel_front_left_joint">
