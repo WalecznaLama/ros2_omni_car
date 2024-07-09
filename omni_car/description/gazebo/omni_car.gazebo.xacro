@@ -14,8 +14,8 @@
     </gazebo>
 
     <!-- Visual and collision properties for wheels -->
-    <xacro:property name="wheel_mu1" value="0.8"/>
-    <xacro:property name="wheel_mu2" value="0.7"/>
+    <xacro:property name="wheel_mu1" value="0.2"/>
+    <xacro:property name="wheel_mu2" value="0.1"/>
     <xacro:property name="wheel_material" value="Gazebo/Yellow"/>
 
     <xacro:macro name="wheel_properties" params="wheel_name">

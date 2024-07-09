@@ -11,7 +11,7 @@
   <link name="${prefix}frame">
     <inertial>
       <origin xyz="0 0 0" rpy="0 0 0" />
-      <mass value="2.0" />
+      <mass value="200.0" />
       <inertia ixx="0.02" ixy="0.0" ixz="0.0" iyy="0.02" iyz="0.0" izz="0.02" />
     </inertial>
     <visual>
@@ -24,7 +24,7 @@
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <box size="0.23 0.13 0.01"/>
+        <box size="0.23 0.1 0.01"/>
       </geometry>
     </collision>
   </link>
