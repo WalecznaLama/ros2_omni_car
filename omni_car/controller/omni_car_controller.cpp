@@ -23,6 +23,10 @@ controller_interface::CallbackReturn RobotController::on_init() {
   command_interface_types_ = auto_declare<std::vector<std::string>>("command_interfaces", command_interface_types_);
   state_interface_types_ = auto_declare<std::vector<std::string>>("state_interfaces", state_interface_types_);
 
+  wheel_radius_ = auto_declare<double>("wheel_radius", 0.0);
+  wheel_base_ = auto_declare<double>("wheel_base", 0.0);
+  wheel_track_ = auto_declare<double>("wheel_track", 0.0);
+
   return CallbackReturn::SUCCESS;
 }
 
@@ -47,8 +51,6 @@ controller_interface::InterfaceConfiguration RobotController::state_interface_co
 }
 
 controller_interface::CallbackReturn RobotController::on_configure(const rclcpp_lifecycle::State &) {
-  if (!get_parameters()) return CallbackReturn::ERROR;
-    
   auto callback = [this](const std::shared_ptr<geometry_msgs::msg::Twist> cmd_vel_msg) -> void {
     cmd_vel_ptr_.writeFromNonRT(cmd_vel_msg);
     new_msg_ = true;
@@ -87,10 +89,10 @@ controller_interface::return_type RobotController::update(const rclcpp::Time & t
 
         // Calculate wheel velocities for mecanum drive
         double wheel_radius_inverse = 1.0 / wheel_radius_;
-        double front_left_velocity = (vx - vy - (wheel_base_ + wheel_track_) * omega) * wheel_radius_inverse;
+        double front_left_velocity  = (vx - vy - (wheel_base_ + wheel_track_) * omega) * wheel_radius_inverse;
         double front_right_velocity = (vx + vy + (wheel_base_ + wheel_track_) * omega) * wheel_radius_inverse;
-        double rear_left_velocity = (vx + vy - (wheel_base_ + wheel_track_) * omega) * wheel_radius_inverse;
-        double rear_right_velocity = (vx - vy + (wheel_base_ + wheel_track_) * omega) * wheel_radius_inverse;
+        double rear_left_velocity   = (vx + vy - (wheel_base_ + wheel_track_) * omega) * wheel_radius_inverse;
+        double rear_right_velocity  = (vx - vy + (wheel_base_ + wheel_track_) * omega) * wheel_radius_inverse;
 
         // Joints are ordered as [front_left, front_right, rear_left, rear_right]
         joint_velocity_command_interface_[0].get().set_value(front_left_velocity);
@@ -112,24 +114,6 @@ controller_interface::CallbackReturn RobotController::on_cleanup(const rclcpp_li
 controller_interface::CallbackReturn RobotController::on_error(const rclcpp_lifecycle::State &) { return CallbackReturn::SUCCESS; }
 
 controller_interface::CallbackReturn RobotController::on_shutdown(const rclcpp_lifecycle::State &) { return CallbackReturn::SUCCESS; }
-
-bool RobotController::get_parameters() {
-    auto node = this->get_node(); // Get the underlying node handle
-    bool success = true;
-
-    success &= node->get_parameter("wheel_radius", wheel_radius_);
-    success &= node->get_parameter("wheel_base", wheel_base_);
-    success &= node->get_parameter("wheel_track", wheel_track_);
-    
-    if (!success) {
-        RCLCPP_ERROR(node->get_logger(), "Failed to get parameters.");
-        return false;
-    }
-    
-    RCLCPP_INFO(node->get_logger(), "Loaded parameters: wheel_radius=%f, wheel_base=%f, wheel_track=%f",
-                                    wheel_radius_, wheel_base_, wheel_track_);
-    return true;
-}
 
 }  // namespace omni_car
 

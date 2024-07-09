@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <robot name="omni_car" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-  <xacro:arg name="prefix" default="" />
+  <xacro:arg name="prefix" default=""/>
 
   <xacro:include filename="$(find omni_car)/urdf/omni_car_description.xacro"/>
   <xacro:include filename="$(find omni_car)/gazebo/omni_car.gazebo.xacro"/>
