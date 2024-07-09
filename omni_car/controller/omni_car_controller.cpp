@@ -18,7 +18,7 @@ namespace omni_car {
 RobotController::RobotController() : controller_interface::ControllerInterface() {}
 
 controller_interface::CallbackReturn RobotController::on_init() {
-  // should have error handling
+  // should have error handling TODO
   joint_names_ = auto_declare<std::vector<std::string>>("joints", joint_names_);
   command_interface_types_ = auto_declare<std::vector<std::string>>("command_interfaces", command_interface_types_);
   state_interface_types_ = auto_declare<std::vector<std::string>>("state_interfaces", state_interface_types_);

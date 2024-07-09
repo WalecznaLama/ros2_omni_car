@@ -9,16 +9,31 @@
       </plugin>
     </gazebo>
 
-
-    <!-- <gazebo reference="${prefix}base_link">
+    <gazebo reference="${prefix}base_link">
       <material>Gazebo/Orange</material>
     </gazebo>
 
-    <gazebo reference="${prefix}link1">
-      <mu1>0.2</mu1>
-      <mu2>0.2</mu2>
-      <material>Gazebo/Yellow</material>
-    </gazebo> -->
+    <!-- Visual and collision properties for wheels -->
+    <xacro:property name="wheel_mu1" value="0.8"/>
+    <xacro:property name="wheel_mu2" value="0.7"/>
+    <xacro:property name="wheel_material" value="Gazebo/Yellow"/>
+
+    <xacro:macro name="wheel_properties" params="wheel_name">
+      <gazebo reference="${prefix}${wheel_name}">
+        <mu1>${wheel_mu1}</mu1>
+        <mu2>${wheel_mu2}</mu2>
+        <material>${wheel_material}</material>
+      </gazebo>
+      <gazebo reference="${prefix}${wheel_name}_force_transform">
+        <mu1>${wheel_mu1}</mu1>
+        <mu2>${wheel_mu2}</mu2>
+      </gazebo>
+    </xacro:macro>
+
+    <xacro:wheel_properties wheel_name="wheel_front_left"/>
+    <xacro:wheel_properties wheel_name="wheel_front_right"/>
+    <xacro:wheel_properties wheel_name="wheel_rear_left"/>
+    <xacro:wheel_properties wheel_name="wheel_rear_right"/>
 
   </xacro:macro>
 
