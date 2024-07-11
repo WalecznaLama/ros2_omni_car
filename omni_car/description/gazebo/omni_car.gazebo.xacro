@@ -13,9 +13,16 @@
       <material>Gazebo/Orange</material>
     </gazebo>
 
+    <!-- Add the force plugin here -->
+    <gazebo>
+      <plugin filename="force_plugin" name="force_plugin::ForcePlugin">
+        <bodyName>${prefix}base_link</bodyName>
+      </plugin>
+    </gazebo>
+
     <!-- Visual and collision properties for wheels -->
-    <xacro:property name="wheel_mu1" value="0.2"/>
-    <xacro:property name="wheel_mu2" value="0.1"/>
+    <xacro:property name="wheel_mu1" value="0.0"/>
+    <xacro:property name="wheel_mu2" value="0.0"/>
     <xacro:property name="wheel_material" value="Gazebo/Yellow"/>
 
     <xacro:macro name="wheel_properties" params="wheel_name">
