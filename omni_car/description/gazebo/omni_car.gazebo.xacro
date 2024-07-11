@@ -17,6 +17,7 @@
     <gazebo>
       <plugin filename="force_plugin" name="force_plugin::ForcePlugin">
         <bodyName>${prefix}base_link</bodyName>
+        <cmdTopic>omni_car_controller/cmd_vel</cmdTopic>
       </plugin>
     </gazebo>
 
@@ -31,10 +32,10 @@
         <mu2>${wheel_mu2}</mu2>
         <material>${wheel_material}</material>
       </gazebo>
-      <gazebo reference="${prefix}${wheel_name}_force_transform">
+      <!-- <gazebo reference="${prefix}${wheel_name}_force_transform">
         <mu1>${wheel_mu1}</mu1>
         <mu2>${wheel_mu2}</mu2>
-      </gazebo>
+      </gazebo> -->
     </xacro:macro>
 
     <xacro:wheel_properties wheel_name="wheel_front_left"/>

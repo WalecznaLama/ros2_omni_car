@@ -26,12 +26,13 @@
             <collision>
                 <origin xyz="0 0 0" rpy="0 0 0" />
                 <geometry>
-                    <cylinder radius="0.0001" length="0.0001"/>
+                    <!-- <cylinder radius="0.0001" length="0.0001"/> -->
+                    <cylinder radius="0.03" length="0.02"/>
                 </geometry>
             </collision>
         </link>
 
-        <link name="${prefix}wheel_${wheel_name}_force_transform">
+        <!-- <link name="${prefix}wheel_${wheel_name}_force_transform">
             <inertial>
                 <origin xyz="0 0 0" rpy="0 0 0" />
                 <mass value="0.3" />
@@ -49,7 +50,7 @@
                     <cylinder radius="0.03" length="0.02"/>
                 </geometry>
             </collision>
-        </link>
+        </link> -->
 
         <joint name="${prefix}wheel_${wheel_name}_joint" type="continuous">
             <parent link="${prefix}frame" />
@@ -59,18 +60,18 @@
             <limit velocity="15.0" effort="30"/>
         </joint>
 
-        <joint name="${prefix}wheel_${wheel_name}_joint_force_transform" type="continuous">
+        <!-- <joint name="${prefix}wheel_${wheel_name}_joint_force_transform" type="continuous">
             <parent link="${prefix}frame"/>
             <child link="${prefix}wheel_${wheel_name}_force_transform"/>
             <xacro:if value="${(is_right and is_front) or (not is_right and not is_front)}">
-                <origin xyz="${wheel_x_offset} ${wheel_y_offset} ${wheel_z_offset}" rpy="${-pi/2} 0 ${pi/4}"/> <!-- 45 deg rotate -->
+                <origin xyz="${wheel_x_offset} ${wheel_y_offset} ${wheel_z_offset}" rpy="${-pi/2} 0 ${pi/4}"/>  45 deg rotate 
             </xacro:if>
             <xacro:unless value="${(is_right and is_front) or (not is_right and not is_front)}">
-                <origin xyz="${wheel_x_offset} ${wheel_y_offset} ${wheel_z_offset}" rpy="${-pi/2} 0 ${-pi/4}"/> <!-- -45 deg rotate -->
+                <origin xyz="${wheel_x_offset} ${wheel_y_offset} ${wheel_z_offset}" rpy="${-pi/2} 0 ${-pi/4}"/>  -45 deg rotate 
             </xacro:unless>
             <axis xyz="0 0 1"/>
             <mimic joint="${prefix}wheel_${wheel_name}_joint" multiplier="1.0"/>
-        </joint>
+        </joint> -->
 
         <transmission name="${prefix}${wheel_name}_trans">
             <type>transmission_interface/SimpleTransmission</type>

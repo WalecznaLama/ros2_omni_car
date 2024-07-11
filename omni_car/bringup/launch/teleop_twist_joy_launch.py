@@ -28,7 +28,7 @@ def generate_launch_description():
                 'scale_linear.x': 0.5,
                 'scale_linear.y': 0.5,
                 'axis_angular.z': 2,
-                'scale_angular': 1.5,
+                'scale_angular.yaw': 1.57,
             }]
         )
     ])

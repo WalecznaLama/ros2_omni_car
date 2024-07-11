@@ -87,9 +87,16 @@ ament_target_dependencies(
   rclcpp
 )
 
-target_link_libraries(force_plugin
-  PRIVATE gz-plugin${GZ_PLUGIN_VER}::gz-plugin${GZ_PLUGIN_VER}
-  PRIVATE gz-sim${GZ_SIM_VER}::gz-sim${GZ_SIM_VER}
+target_link_libraries(force_plugin PUBLIC
+  gz-plugin${GZ_PLUGIN_VER}::gz-plugin${GZ_PLUGIN_VER}
+  gz-sim${GZ_SIM_VER}::gz-sim${GZ_SIM_VER}
+)
+
+install(
+  TARGETS force_plugin
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
 )
 
 ## Test

@@ -4,6 +4,7 @@
 #include <gz/sim/System.hh>
 #include <geometry_msgs/msg/twist.hpp>
 #include <rclcpp/rclcpp.hpp>
+#include <thread>
 
 namespace force_plugin
 {
@@ -25,6 +26,7 @@ namespace force_plugin
     rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr sub_;
     gz::sim::Entity baseLinkEntity_;
     double forceX_, forceY_, torqueZ_;
+    std::thread rclcpp_thread_;
   };
 }
 
