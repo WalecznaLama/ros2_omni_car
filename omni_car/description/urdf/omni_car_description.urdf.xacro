@@ -4,7 +4,9 @@
   <xacro:macro name="omni_car" params="prefix">
 
   <xacro:include filename="$(find omni_car)/urdf/omni_car.materials.xacro"/>
-  <xacro:include filename="$(find omni_car)/urdf/wheel.xacro"/>
+  <xacro:include filename="$(find omni_car)/urdf/wheel.urdf.xacro"/>
+  <xacro:include filename="$(find omni_car)/urdf/imu.urdf.xacro"/>
+  <xacro:include filename="$(find omni_car)/urdf/lidar.urdf.xacro"/>
 
   <link name="${prefix}base_link"/>
 
@@ -43,6 +45,13 @@
   <xacro:wheel wheel_site="rear_left" wheel_x_offset="${-wheel_x_offset}" wheel_y_offset="${wheel_y_offset}" wheel_z_offset="${wheel_z_offset}" prefix="${prefix}"/>
   <xacro:wheel wheel_site="rear_right" wheel_x_offset="${-wheel_x_offset}" wheel_y_offset="${-wheel_y_offset}" wheel_z_offset="${wheel_z_offset}" prefix="${prefix}"/>
 
-  </xacro:macro>
+  <xacro:imu name="imu" prefix="${prefix}">
+    <origin xyz="0 0 -0.001" rpy="0 0 0"/>
+  </xacro:imu>
 
+  <xacro:lidar name="lidar" prefix="${prefix}">
+    <origin xyz="-0.042 0 0.005" rpy="0 0 0"/>
+  </xacro:lidar>
+
+  </xacro:macro>
 </robot>

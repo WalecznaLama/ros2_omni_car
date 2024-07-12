@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://wiki.ros.org/xacro">
+  <xacro:property name="lidar_base_size_x" value="0.1" />
+  <xacro:property name="lidar_base_size_y" value="0.08" />
+  <xacro:property name="lidar_base_size_z" value="0.002" />
+
+  <xacro:property name="beam_z" value="0.045" />
+  <xacro:macro name="lidar" params="name prefix *origin">
+    <link name="${prefix}${name}_base_link">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <box size="${lidar_base_size_x} ${lidar_base_size_y} ${lidar_base_size_z}"/>
+        </geometry>
+        <material name="green" />
+      </visual>
+    </link>
+
+    <link name="${prefix}${name}_main_link">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <mesh filename="file://$(find omni_car)/meshes/rplidar.stl"/>
+        </geometry>
+        <material name="green"/>
+      </visual>
+    </link>
+
+    <link name="${prefix}${name}_beam_link"/>
+
+    <joint name="${prefix}${name}_base_joint" type="fixed">
+      <xacro:insert_block name="origin" />
+      <parent link="${prefix}frame"/>
+      <child link="${prefix}${name}_base_link"/>
+    </joint>
+
+    <joint name="${prefix}${name}_main_joint" type="fixed">
+      <origin xyz="0 0 ${lidar_base_size_z/2}" rpy="0 0 0" />
+      <parent link="${prefix}${name}_base_link"/>
+      <child link="${prefix}${name}_main_link"/>
+    </joint>
+
+    <joint name="${prefix}${name}_beam_joint" type="fixed">
+      <origin xyz="0 0 ${beam_z}" rpy="0 0 0" />
+      <parent link="${prefix}${name}_base_link"/>
+      <child link="${prefix}${name}_beam_link"/>
+    </joint>
+
+  </xacro:macro>
+</robot>

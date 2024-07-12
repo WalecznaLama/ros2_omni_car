@@ -36,14 +36,10 @@ def generate_launch_description():
         executable="create",
         output="screen",
         arguments=[
-            "-topic",
-            "/robot_description",
-            "-name",
-            "omni_car",
-            "-allow_renaming",
-            "true",
-            "-z",
-            "0.2"
+            "-topic", "/robot_description",
+            "-name", "omni_car",
+            "-allow_renaming", "true",
+            "-z", "0.06"
         ],
     )
 

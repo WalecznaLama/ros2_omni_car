@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://wiki.ros.org/xacro">
+  <xacro:macro name="wheel" params="wheel_site wheel_x_offset wheel_y_offset wheel_z_offset prefix">
+    <link name="${prefix}wheel_${wheel_site}">
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <mass value="0.3" />
+        <inertia ixx="0.02" ixy="0.0" ixz="0.0" iyy="0.02" iyz="0.0" izz="0.02" />
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="${-pi/2} 0 0" />
+        <geometry>
+          <mesh filename="file://$(find omni_car)/meshes/wheel_${wheel_site}.dae" />
+        </geometry>
+        <material name="yellow"/>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <cylinder radius="0.03" length="0.02"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <joint name="${prefix}wheel_${wheel_site}_joint" type="continuous">
+      <parent link="${prefix}frame" />
+      <child link="${prefix}wheel_${wheel_site}" />
+      <axis xyz="0 0 1" />
+      <origin xyz="${wheel_x_offset} ${wheel_y_offset} ${wheel_z_offset}" rpy="${-pi/2} 0 0"/>
+      <limit velocity="15.0" effort="30"/>
+    </joint>
+
+    <transmission name="${prefix}${wheel_site}_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="${prefix}wheel_${wheel_site}_joint">
+        <hardwareInterface>VelocityJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="${prefix}${wheel_site}_motor">
+        <mechanicalReduction>1</mechanicalReduction>
+      </actuator>
+    </transmission>
+    
+  </xacro:macro>
+</robot>
