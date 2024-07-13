@@ -2,28 +2,27 @@
 
   <xacro:macro name="omni_car_gazebo" params="prefix">
 
-    <!-- ros_control plugin -->
     <gazebo>
+      <!-- ros2_control plugin -->
       <plugin filename="gz_ros2_control-system" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
         <parameters>$(find omni_car)/config/omni_car_controllers.yaml</parameters>
       </plugin>
+      <!-- Sensors plugins -->
       <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors">
         <render_engine>ogre2</render_engine>
       </plugin>
       <plugin filename="gz-sim-imu-system" name="gz::sim::systems::Imu"/>
+      <!-- Force plugin (solution to the problem mecanum wheels) -->
+      <plugin filename="force_plugin" name="force_plugin::ForcePlugin">
+        <bodyName>${prefix}base_link</bodyName>
+        <cmdTopic>omni_car_controller/cmd_vel</cmdTopic>
+      </plugin>
     </gazebo>
 
     <gazebo reference="${prefix}base_link">
       <material>Gazebo/Orange</material>
     </gazebo>
 
-    <!-- Add the force plugin here -->
-    <gazebo>
-      <plugin filename="force_plugin" name="force_plugin::ForcePlugin">
-        <bodyName>${prefix}base_link</bodyName>
-        <cmdTopic>omni_car_controller/cmd_vel</cmdTopic>
-      </plugin>
-    </gazebo>
 
     <!-- Properties for wheels -->
     <xacro:property name="wheel_mu1" value="0.0"/>
@@ -43,6 +42,8 @@
     <xacro:wheel_properties wheel_name="wheel_rear_left"/>
     <xacro:wheel_properties wheel_name="wheel_rear_right"/>
 
+    <!-- _____Sensors_____ -->
+    <!-- Lidar -->
     <gazebo reference="${prefix}lidar_beam_link" >
       <sensor name="lidar" type="gpu_lidar">
         <gz_frame_id>${prefix}lidar_beam_link</gz_frame_id>
@@ -75,14 +76,15 @@
       </sensor>
     </gazebo>
 
+    <!-- IMU -->
     <gazebo reference="${prefix}imu_link" >
-        <sensor name="imu" type="imu">
-          <always_on>1</always_on>
-          <update_rate>100</update_rate>
-          <visualize>true</visualize>
-          <topic>imu</topic>
-          <enable_metrics>true</enable_metrics>
-        </sensor>
+      <sensor name="imu" type="imu">
+        <always_on>1</always_on>
+        <update_rate>100</update_rate>
+        <visualize>true</visualize>
+        <topic>imu</topic>
+        <enable_metrics>true</enable_metrics>
+      </sensor>
     </gazebo>
 
   </xacro:macro>
