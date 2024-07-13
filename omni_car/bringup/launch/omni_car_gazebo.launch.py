@@ -28,7 +28,7 @@ def generate_launch_description():
             [FindPackageShare("ros_gz_sim"), "/launch/gz_sim.launch.py"]
         ),
         # launch_arguments={"gz_args": " -r -v 3 empty.sdf --physics-engine gz-physics-bullet-featherstone-plugin"}.items(),
-        launch_arguments={"gz_args": " -r -v 3 empty.sdf"}.items(),
+        launch_arguments={"gz_args": " -r -v 4 empty.sdf"}.items(),  # -v verbose level, -r run immediately 
     )
 
     gz_spawn_entity = Node(
@@ -78,6 +78,16 @@ def generate_launch_description():
         executable="spawner",
         arguments=["omni_car_controller", "--controller-manager", "/controller_manager"],
     )
+
+    # Bridge
+    bridge = Node(
+        package='ros_gz_bridge',
+        executable='parameter_bridge',
+        arguments=['/scan@sensor_msgs/msg/LaserScan@gz.msgs.LaserScan',
+                   '/imu@sensor_msgs/msg/Imu@gz.msgs.IMU'],
+        output='screen'
+    )
+
     rviz_node = Node(
         package="rviz2",
         executable="rviz2",
@@ -93,6 +103,7 @@ def generate_launch_description():
         gz_spawn_entity,
         joint_state_broadcaster_spawner,
         robot_controller_spawner,
+        bridge,
         rviz_node,
     ]
 

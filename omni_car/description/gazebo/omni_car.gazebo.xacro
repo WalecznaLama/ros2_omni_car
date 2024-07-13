@@ -7,6 +7,10 @@
       <plugin filename="gz_ros2_control-system" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
         <parameters>$(find omni_car)/config/omni_car_controllers.yaml</parameters>
       </plugin>
+      <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors">
+        <render_engine>ogre2</render_engine>
+      </plugin>
+      <plugin filename="gz-sim-imu-system" name="gz::sim::systems::Imu"/>
     </gazebo>
 
     <gazebo reference="${prefix}base_link">
@@ -38,6 +42,48 @@
     <xacro:wheel_properties wheel_name="wheel_front_right"/>
     <xacro:wheel_properties wheel_name="wheel_rear_left"/>
     <xacro:wheel_properties wheel_name="wheel_rear_right"/>
+
+    <gazebo reference="${prefix}lidar_beam_link" >
+      <sensor name="lidar" type="gpu_lidar">
+        <gz_frame_id>${prefix}lidar_beam_link</gz_frame_id>
+        <topic>scan</topic>
+        <update_rate>30</update_rate>
+        <lidar>
+          <scan>
+            <horizontal>
+              <samples>1000</samples>
+              <resolution>1</resolution>
+              <min_angle>-3.1414</min_angle>
+              <max_angle>3.1414</max_angle>
+            </horizontal>
+            <vertical>
+              <samples>1</samples>
+              <resolution>0.1</resolution>
+              <min_angle>0.0</min_angle>
+              <max_angle>0.0</max_angle>
+            </vertical>
+          </scan>
+          <range>
+            <min>0.1</min>
+            <max>10.0</max>
+            <resolution>0.01</resolution>
+          </range>
+          <frame_id>${prefix}lidar_beam_link</frame_id>
+        </lidar>
+        <alwaysOn>ture</alwaysOn>
+        <visualize>true</visualize>
+      </sensor>
+    </gazebo>
+
+    <gazebo reference="${prefix}imu_link" >
+        <sensor name="imu" type="imu">
+          <always_on>1</always_on>
+          <update_rate>100</update_rate>
+          <visualize>true</visualize>
+          <topic>imu</topic>
+          <enable_metrics>true</enable_metrics>
+        </sensor>
+    </gazebo>
 
   </xacro:macro>
 
