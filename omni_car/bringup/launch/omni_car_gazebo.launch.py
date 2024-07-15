@@ -13,21 +13,20 @@ def generate_launch_description():
     declared_arguments = []
     declared_arguments.append(
         DeclareLaunchArgument(
-            "gui",
+            "rviz",
             default_value="false",
             description="Start RViz2 automatically with this launch file.",
         )
     )
 
     # Initialize Arguments
-    gui = LaunchConfiguration("gui")
+    rviz = LaunchConfiguration("rviz")
 
     # gazebo
     gazebo = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             [FindPackageShare("ros_gz_sim"), "/launch/gz_sim.launch.py"]
         ),
-        # launch_arguments={"gz_args": " -r -v 3 empty.sdf --physics-engine gz-physics-bullet-featherstone-plugin"}.items(),
         launch_arguments={"gz_args": " -r -v 4 empty.sdf"}.items(),  # -v verbose level, -r run immediately 
     )
 
@@ -63,8 +62,13 @@ def generate_launch_description():
     node_robot_state_publisher = Node(
         package="robot_state_publisher",
         executable="robot_state_publisher",
-        output="screen",
+        output="both",
         parameters=[robot_description],
+    )
+
+    node_joint_state_publisher = Node(
+        package="joint_state_publisher",
+        executable="joint_state_publisher",
     )
 
     joint_state_broadcaster_spawner = Node(
@@ -88,23 +92,24 @@ def generate_launch_description():
         output='screen'
     )
 
-    rviz_node = Node(
+    node_rviz = Node(
         package="rviz2",
         executable="rviz2",
         name="rviz2",
         output="log",
         arguments=["-d", rviz_config_file],
-        condition=IfCondition(gui),
+        condition=IfCondition(rviz),
     )
 
     nodes = [
         gazebo,
+        node_joint_state_publisher,
         node_robot_state_publisher,
         gz_spawn_entity,
         joint_state_broadcaster_spawner,
         robot_controller_spawner,
         bridge,
-        rviz_node,
+        node_rviz,
     ]
 
     return LaunchDescription(declared_arguments + nodes)

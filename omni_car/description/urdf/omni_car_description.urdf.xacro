@@ -7,24 +7,22 @@
   <xacro:include filename="$(find omni_car)/urdf/wheel.urdf.xacro"/>
   <xacro:include filename="$(find omni_car)/urdf/imu.urdf.xacro"/>
   <xacro:include filename="$(find omni_car)/urdf/lidar.urdf.xacro"/>
+  <xacro:include filename="$(find omni_car)/urdf/kinect.urdf.xacro"/>
 
   <link name="${prefix}base_link"/>
 
   <link name="${prefix}frame">
     <inertial>
-      <origin xyz="0 0 0" rpy="0 0 0" />
-      <mass value="200.0" />
+      <mass value="20.0" />
       <inertia ixx="0.02" ixy="0.0" ixz="0.0" iyy="0.02" iyz="0.0" izz="0.02" />
     </inertial>
     <visual>
-      <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
         <mesh filename="file://$(find omni_car)/meshes/base_link.dae" />
       </geometry>
       <material name="black"/>
     </visual>
     <collision>
-      <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
         <box size="0.23 0.1 0.01"/>
       </geometry>
@@ -45,13 +43,17 @@
   <xacro:wheel wheel_site="rear_left" wheel_x_offset="${-wheel_x_offset}" wheel_y_offset="${wheel_y_offset}" wheel_z_offset="${wheel_z_offset}" prefix="${prefix}"/>
   <xacro:wheel wheel_site="rear_right" wheel_x_offset="${-wheel_x_offset}" wheel_y_offset="${-wheel_y_offset}" wheel_z_offset="${wheel_z_offset}" prefix="${prefix}"/>
 
-  <xacro:imu name="imu" prefix="${prefix}">
+  <xacro:imu name="imu" parent_frame="${prefix}frame" prefix="${prefix}">
     <origin xyz="0 0 -0.001" rpy="0 0 0"/>
   </xacro:imu>
 
-  <xacro:lidar name="lidar" prefix="${prefix}">
-    <origin xyz="-0.042 0 0.005" rpy="0 0 0"/>
+  <xacro:lidar name="lidar" parent_frame="${prefix}frame" prefix="${prefix}">
+    <origin xyz="-0.042 0 0.0215" rpy="0 0 0"/>
   </xacro:lidar>
+
+  <xacro:kinect name="kinect" parent_frame="${prefix}frame" prefix="${prefix}">
+    <origin xyz="0.1 0 0.055" rpy="0 0 0"/>
+  </xacro:kinect>
 
   </xacro:macro>
 </robot>

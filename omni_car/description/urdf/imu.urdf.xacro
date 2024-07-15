@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://wiki.ros.org/xacro">
   <xacro:property name="imu_size" value="0.002" />
-  <xacro:macro name="imu" params="name prefix *origin">
+  <xacro:macro name="imu" params="name parent_frame prefix *origin">
     <link name="${prefix}${name}_link">
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
@@ -13,7 +13,7 @@
     </link>
     <joint name="${prefix}${name}_joint" type="fixed">
       <xacro:insert_block name="origin" />
-      <parent link="${prefix}frame"/>
+      <parent link="${parent_frame}"/>
       <child link="${prefix}${name}_link"/>
     </joint>
   </xacro:macro>
