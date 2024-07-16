@@ -1,3 +1,16 @@
+joy:
+  dev': '/dev/input/js0'
+  deadzone': 0.1
+  autorepeat_rate': 20.0
+
 teleop_twist_joy:
   require_enable_button: False
   enable_button: 0
+  axis_linear:
+    x: 1
+    y: 0
+  scale_linear:
+    x: 0.5
+    y: 0.5
+  axis_angular.z: 2
+  scale_angular.yaw: 1.57

@@ -39,6 +39,7 @@ def generate_launch_description():
     )
     robot_description = {"robot_description": robot_description_content}
 
+    world_sdf_file = PathJoinSubstitution([FindPackageShare("omni_car"), "gazebo", "world.sdf"])
     rviz_config_file = PathJoinSubstitution([FindPackageShare("omni_car"), "rviz", "rviz.rviz"])
 
     # gazebo
@@ -56,6 +57,16 @@ def generate_launch_description():
             "-name", "omni_car",
             "-allow_renaming", "true",
             "-z", "0.06"
+        ],
+    )
+    gz_spawn_world = Node(
+        package="ros_gz_sim",
+        executable="create",
+        output="screen",
+        arguments=[
+            "-file", world_sdf_file,
+            "-name", "world",
+            "-allow_renaming", "true",
         ],
     )
 
@@ -115,6 +126,7 @@ def generate_launch_description():
     nodes = [
         gazebo,
         gz_spawn_entity,
+        gz_spawn_world,
         joint_state_publisher,
         robot_state_publisher,
         joint_state_broadcaster_spawner,

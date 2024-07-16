@@ -39,7 +39,7 @@
     </gazebo>
 
     <!-- Properties for wheels -->
-    <xacro:property name="wheel_mu1" value="1.0"/>
+    <xacro:property name="wheel_mu1" value="0.0"/>
     <xacro:property name="wheel_mu2" value="0.0"/>
     <xacro:property name="wheel_material" value="Gazebo/Yellow"/>
 
