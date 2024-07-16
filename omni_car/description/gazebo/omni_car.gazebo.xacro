@@ -7,16 +7,31 @@
       <plugin filename="gz_ros2_control-system" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
         <parameters>$(find omni_car)/config/omni_car_controllers.yaml</parameters>
       </plugin>
+      
       <!-- Sensors plugins -->
       <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors">
         <render_engine>ogre2</render_engine>
       </plugin>
       <plugin filename="gz-sim-imu-system" name="gz::sim::systems::Imu"/>
+
       <!-- Force plugin (solution to the problem mecanum wheels) -->
       <plugin filename="force_plugin" name="force_plugin::ForcePlugin">
         <bodyName>${prefix}base_link</bodyName>
         <cmdTopic>omni_car_controller/cmd_vel</cmdTopic>
       </plugin>
+
+      <!-- /usr/share/gz/gz-sim8/worlds/mecanum_drive.sdf -->
+      <!-- <plugin filename="gz-sim-mecanum-drive-system" name="gz::sim::systems::MecanumDrive">
+        <front_left_joint>wheel_front_left_joint</front_left_joint>
+        <front_right_joint>wheel_front_right_joint</front_right_joint>
+        <back_left_joint>wheel_rear_left_joint</back_left_joint>
+        <back_right_joint>wheel_rear_right_joint</back_right_joint>
+        <wheel_separation>1.25</wheel_separation>
+        <wheelbase>1.511</wheelbase>
+        <wheel_radius>0.3</wheel_radius>
+        <min_acceleration>-5</min_acceleration>
+        <max_acceleration>5</max_acceleration>
+      </plugin> -->
     </gazebo>
 
     <gazebo reference="${prefix}base_link">
@@ -24,7 +39,7 @@
     </gazebo>
 
     <!-- Properties for wheels -->
-    <xacro:property name="wheel_mu1" value="0.0"/>
+    <xacro:property name="wheel_mu1" value="1.0"/>
     <xacro:property name="wheel_mu2" value="0.0"/>
     <xacro:property name="wheel_material" value="Gazebo/Yellow"/>
 

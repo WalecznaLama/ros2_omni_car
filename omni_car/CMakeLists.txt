@@ -54,6 +54,10 @@ install(
   DIRECTORY bringup/launch bringup/config
   DESTINATION share/omni_car
 )
+install(
+  DIRECTORY worlds
+  DESTINATION share/omni_car
+)
 
 install(TARGETS omni_car
   EXPORT export_omni_car
