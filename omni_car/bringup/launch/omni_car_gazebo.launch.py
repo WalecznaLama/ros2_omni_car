@@ -45,7 +45,7 @@ def generate_launch_description():
     # gazebo
     gazebo = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([FindPackageShare("ros_gz_sim"), "/launch/gz_sim.launch.py"]),
-        launch_arguments={"gz_args": " -r -v 4 empty.sdf"}.items(),  # -v verbose level, -r run immediately 
+        launch_arguments={"gz_args": " -r -v 3 empty.sdf"}.items(),  # -v verbose level, -r run immediately 
     )
 
     gz_spawn_entity = Node(
@@ -91,7 +91,7 @@ def generate_launch_description():
     robot_controller_spawner = Node(
         package="controller_manager",
         executable="spawner",
-        arguments=["omni_car_controller", "--controller-manager", "/controller_manager"],
+        arguments=["omni_drive_controller", "--controller-manager", "/controller_manager"],
     )
 
     # Bridge

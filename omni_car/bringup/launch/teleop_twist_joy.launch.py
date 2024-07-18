@@ -17,7 +17,7 @@ def generate_launch_description():
             package='teleop_twist_joy',
             executable='teleop_node',
             name='teleop_twist_joy_node',
-            remappings=[('/cmd_vel', '/omni_car_controller/cmd_vel')],
+            remappings=[('/cmd_vel', '/omni_drive_controller/cmd_vel')],
             parameters=[config_file]
         )
     ])

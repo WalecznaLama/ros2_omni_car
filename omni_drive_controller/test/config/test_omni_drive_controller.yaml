@@ -1,16 +1,6 @@
-controller_manager:
+test_omni_drive_controller:
   ros__parameters:
-    update_rate: 30  # Hz
-
-    joint_state_broadcaster:
-      type: joint_state_broadcaster/JointStateBroadcaster
-
-    omni_drive_controller:
-      type: omni_drive_controller/OmniDriveController
-
-omni_drive_controller:
-  ros__parameters:
-    wheel_names: [wheel_front_left_joint , wheel_front_right_joint , wheel_rear_left_joint , wheel_rear_right_joint]
+    wheel_names: ["wheel_front_left_joint" , "wheel_front_right_joint" , "wheel_rear_left_joint" , "wheel_rear_right_joint"]
 
     wheel_separation: 0.156
     wheel_track: 0.16
