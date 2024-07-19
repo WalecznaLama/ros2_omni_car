@@ -18,8 +18,7 @@
 
 #include "omni_drive_controller/odometry.hpp"
 
-namespace omni_drive_controller
-{
+namespace omni_drive_controller {
 Odometry::Odometry(size_t velocity_rolling_window_size)
 : timestamp_(0.0),
   x_(0.0),
@@ -76,10 +75,13 @@ bool Odometry::update(double front_left_pos, double front_right_pos, double rear
 bool Odometry::updateFromVelocity(double front_left_vel, double front_right_vel, double rear_left_vel, double rear_right_vel, const rclcpp::Time & time) {
   const double dt = time.seconds() - timestamp_.seconds();
 
-  // Compute linear and angular: // TODO
-  const double linear_x = 0.;
-  const double linear_y = 0.;
-  const double angular = 0.;
+  // Compute linear and angular:
+  const double sum_velocity = front_left_vel + front_right_vel + rear_left_vel + rear_right_vel;
+  const double separation_track = wheel_separation_ + wheel_track_;
+
+  const double linear_x = wheel_radius_ * 0.25 * sum_velocity;
+  const double linear_y = wheel_radius_ * 0.25 * (-front_left_vel + front_right_vel + rear_left_vel - rear_right_vel);
+  const double angular = wheel_radius_ * 0.25 / separation_track * (-front_left_vel + front_right_vel - rear_left_vel + rear_right_vel);
 
   // Integrate odometry:
   integrateExact(linear_x, linear_y, angular);
@@ -127,10 +129,23 @@ void Odometry::setVelocityRollingWindowSize(size_t velocity_rolling_window_size)
   resetAccumulators();
 }
 
-void Odometry::integrateExact(double linear_x, double linear_y, double angular) {
+void Odometry::integrateExact(double linear_x, double linear_y, double angular)
+{
+  const double heading_old = heading_;
   heading_ += angular;
-  x_ += linear_x;
-  y_ += linear_y;
+
+  const double cos_heading_old = cos(heading_old);
+  const double sin_heading_old = sin(heading_old);
+  const double cos_heading_new = cos(heading_);
+  const double sin_heading_new = sin(heading_);
+
+  if (fabs(angular) > 1e-6) { // Avoid division by zero
+      x_ += (linear_x * (cos_heading_new - cos_heading_old) - linear_y * (sin_heading_new - sin_heading_old)) / angular;
+      y_ += (linear_x * (sin_heading_new - sin_heading_old) + linear_y * (cos_heading_new - cos_heading_old)) / angular;
+  } else { // When angular is very small, use linear integration
+      x_ += linear_x * cos_heading_old - linear_y * sin_heading_old;
+      y_ += linear_x * sin_heading_old + linear_y * cos_heading_old;
+  }
 }
 
 void Odometry::resetAccumulators() {

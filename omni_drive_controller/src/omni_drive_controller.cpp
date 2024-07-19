@@ -29,16 +29,14 @@
 #include "rclcpp/logging.hpp"
 #include "tf2/LinearMath/Quaternion.h"
 
-namespace
-{
+namespace {
 constexpr auto DEFAULT_COMMAND_TOPIC = "~/cmd_vel";
 constexpr auto DEFAULT_COMMAND_OUT_TOPIC = "~/cmd_vel_out";
 constexpr auto DEFAULT_ODOMETRY_TOPIC = "~/odom";
 constexpr auto DEFAULT_TRANSFORM_TOPIC = "/tf";
 }  // namespace
 
-namespace omni_drive_controller
-{
+namespace omni_drive_controller {
 using namespace std::chrono_literals;
 using controller_interface::interface_configuration_type;
 using controller_interface::InterfaceConfiguration;
@@ -48,21 +46,15 @@ using lifecycle_msgs::msg::State;
 
 OmniDriveController::OmniDriveController() : controller_interface::ControllerInterface() {}
 
-const char * OmniDriveController::feedback_type() const
-{
-  return params_.position_feedback ? HW_IF_POSITION : HW_IF_VELOCITY;
-}
+const char * OmniDriveController::feedback_type() const{ return params_.position_feedback ? HW_IF_POSITION : HW_IF_VELOCITY; }
 
-controller_interface::CallbackReturn OmniDriveController::on_init()
-{
-  try
-  {
+controller_interface::CallbackReturn OmniDriveController::on_init() {
+  try {
     // Create the parameter listener and get the parameters
     param_listener_ = std::make_shared<ParamListener>(get_node());
     params_ = param_listener_->get_params();
   }
-  catch (const std::exception & e)
-  {
+  catch (const std::exception & e) {
     fprintf(stderr, "Exception thrown during init stage with message: %s \n", e.what());
     return controller_interface::CallbackReturn::ERROR;
   }
@@ -70,28 +62,23 @@ controller_interface::CallbackReturn OmniDriveController::on_init()
   return controller_interface::CallbackReturn::SUCCESS;
 }
 
-InterfaceConfiguration OmniDriveController::command_interface_configuration() const
-{
+InterfaceConfiguration OmniDriveController::command_interface_configuration() const {
   std::vector<std::string> conf_names;
   for (const auto & joint_name : params_.wheel_names) conf_names.push_back(joint_name + "/" + HW_IF_VELOCITY);
   return {interface_configuration_type::INDIVIDUAL, conf_names};
 }
 
-InterfaceConfiguration OmniDriveController::state_interface_configuration() const
-{
+InterfaceConfiguration OmniDriveController::state_interface_configuration() const {
   std::vector<std::string> conf_names;
   for (const auto & joint_name : params_.wheel_names) conf_names.push_back(joint_name + "/" + feedback_type());
   return {interface_configuration_type::INDIVIDUAL, conf_names};
 }
 
 controller_interface::return_type OmniDriveController::update(
-  const rclcpp::Time & time, const rclcpp::Duration & period)
-{
+  const rclcpp::Time & time, const rclcpp::Duration & period) {
   auto logger = get_node()->get_logger();
-  if (get_state().id() == State::PRIMARY_STATE_INACTIVE)
-  {
-    if (!is_halted)
-    {
+  if (get_state().id() == State::PRIMARY_STATE_INACTIVE) {
+    if (!is_halted) {
       halt();
       is_halted = true;
     }
@@ -101,16 +88,14 @@ controller_interface::return_type OmniDriveController::update(
   std::shared_ptr<Twist> last_command_msg;
   received_velocity_msg_ptr_.get(last_command_msg);
 
-  if (last_command_msg == nullptr)
-  {
+  if (last_command_msg == nullptr) {
     RCLCPP_WARN(logger, "Velocity message received was a nullptr.");
     return controller_interface::return_type::ERROR;
   }
 
   const auto age_of_last_command = time - last_command_msg->header.stamp;
   // Brake if cmd_vel has timeout, override the stored command
-  if (age_of_last_command > cmd_vel_timeout_)
-  {
+  if (age_of_last_command > cmd_vel_timeout_) {
     last_command_msg->twist.linear.x = 0.0;
     last_command_msg->twist.linear.y = 0.0;
     last_command_msg->twist.angular.z = 0.0;
@@ -125,34 +110,24 @@ controller_interface::return_type OmniDriveController::update(
 
   previous_update_timestamp_ = time;
 
-
   const double wheel_separation = params_.wheel_separation;
   const double wheel_track = params_.wheel_track;
   const double wheel_radius = params_.wheel_radius;
 
-  if (params_.open_loop)
-  {
-    odometry_.updateOpenLoop(linear_x_command, linear_y_command, angular_command, time);
-  }
-  else
-  {
+  if (params_.open_loop) odometry_.updateOpenLoop(linear_x_command, linear_y_command, angular_command, time);
+  else {
     const double fl_feedback = registered_wheel_handles_[0].feedback.get().get_value();
     const double fr_feedback = registered_wheel_handles_[1].feedback.get().get_value();
     const double rl_feedback = registered_wheel_handles_[2].feedback.get().get_value();
     const double rr_feedback = registered_wheel_handles_[3].feedback.get().get_value();
 
-    if (std::isnan(fl_feedback) || std::isnan(fr_feedback) || std::isnan(rl_feedback) || std::isnan(rr_feedback))
-    {
+    if (std::isnan(fl_feedback) || std::isnan(fr_feedback) || std::isnan(rl_feedback) || std::isnan(rr_feedback)) {
       RCLCPP_ERROR(logger, "Either the wheels %s is invalid", feedback_type());
       return controller_interface::return_type::ERROR;
     }
 
-    if (params_.position_feedback)
-    {
-      odometry_.update(fl_feedback, fr_feedback, rl_feedback, rr_feedback, time);
-    }
-    else
-    {
+    if (params_.position_feedback) odometry_.update(fl_feedback, fr_feedback, rl_feedback, rr_feedback, time);
+    else {
       odometry_.updateFromVelocity(
         fl_feedback * wheel_radius * period.seconds(),
         fr_feedback * wheel_radius * period.seconds(),
@@ -166,25 +141,20 @@ controller_interface::return_type OmniDriveController::update(
   orientation.setRPY(0.0, 0.0, odometry_.getHeading());
 
   bool should_publish = false;
-  try
-  {
-    if (previous_publish_timestamp_ + publish_period_ < time)
-    {
+  try {
+    if (previous_publish_timestamp_ + publish_period_ < time) {
       previous_publish_timestamp_ += publish_period_;
       should_publish = true;
     }
   }
-  catch (const std::runtime_error &)
-  {
+  catch (const std::runtime_error &) {
     // Handle exceptions when the time source changes and initialize publish timestamp
     previous_publish_timestamp_ = time;
     should_publish = true;
   }
 
-  if (should_publish)
-  {
-    if (realtime_odometry_publisher_->trylock())
-    {
+  if (should_publish) {
+    if (realtime_odometry_publisher_->trylock()) {
       auto & odometry_message = realtime_odometry_publisher_->msg_;
       odometry_message.header.stamp = time;
       odometry_message.pose.pose.position.x = odometry_.getX();
@@ -199,8 +169,7 @@ controller_interface::return_type OmniDriveController::update(
       realtime_odometry_publisher_->unlockAndPublish();
     }
 
-    if (params_.enable_odom_tf && realtime_odometry_transform_publisher_->trylock())
-    {
+    if (params_.enable_odom_tf && realtime_odometry_transform_publisher_->trylock()) {
       auto & transform = realtime_odometry_transform_publisher_->msg_.transforms.front();
       transform.header.stamp = time;
       transform.transform.translation.x = odometry_.getX();
@@ -223,8 +192,7 @@ controller_interface::return_type OmniDriveController::update(
   previous_commands_.emplace(command);
 
   //    Publish limited velocity
-  if (publish_limited_velocity_ && realtime_limited_velocity_publisher_->trylock())
-  {
+  if (publish_limited_velocity_ && realtime_limited_velocity_publisher_->trylock()) {
     auto & limited_velocity_command = realtime_limited_velocity_publisher_->msg_;
     limited_velocity_command.header.stamp = time;
     limited_velocity_command.twist = command.twist;
@@ -247,9 +215,7 @@ controller_interface::return_type OmniDriveController::update(
   return controller_interface::return_type::OK;
 }
 
-controller_interface::CallbackReturn OmniDriveController::on_configure(
-  const rclcpp_lifecycle::State &)
-{
+controller_interface::CallbackReturn OmniDriveController::on_configure(const rclcpp_lifecycle::State &) {
   auto logger = get_node()->get_logger();
 
   // update parameters if they have changed
@@ -291,13 +257,9 @@ controller_interface::CallbackReturn OmniDriveController::on_configure(
     params_.angular.z.max_velocity, params_.angular.z.min_acceleration,
     params_.angular.z.max_acceleration, params_.angular.z.min_jerk, params_.angular.z.max_jerk);
 
-  if (!reset())
-  {
-    return controller_interface::CallbackReturn::ERROR;
-  }
-
-  if (publish_limited_velocity_)
-  {
+  if (!reset()) return controller_interface::CallbackReturn::ERROR;
+  
+  if (publish_limited_velocity_) {
     limited_velocity_publisher_ =
       get_node()->create_publisher<Twist>(DEFAULT_COMMAND_OUT_TOPIC, rclcpp::SystemDefaultsQoS());
     realtime_limited_velocity_publisher_ =
@@ -314,15 +276,12 @@ controller_interface::CallbackReturn OmniDriveController::on_configure(
   // initialize command subscriber
   velocity_command_subscriber_ = get_node()->create_subscription<Twist>(
     DEFAULT_COMMAND_TOPIC, rclcpp::SystemDefaultsQoS(),
-    [this](const std::shared_ptr<Twist> msg) -> void
-    {
-      if (!subscriber_is_active_)
-      {
+    [this](const std::shared_ptr<Twist> msg) -> void {
+      if (!subscriber_is_active_) {
         RCLCPP_WARN(get_node()->get_logger(), "Can't accept new commands. subscriber is inactive");
         return;
       }
-      if ((msg->header.stamp.sec == 0) && (msg->header.stamp.nanosec == 0))
-      {
+      if ((msg->header.stamp.sec == 0) && (msg->header.stamp.nanosec == 0)) {
         RCLCPP_WARN_ONCE(
           get_node()->get_logger(),
           "Received TwistStamped with zero timestamp, setting it to current "
@@ -341,25 +300,12 @@ controller_interface::CallbackReturn OmniDriveController::on_configure(
 
   // Append the tf prefix if there is one
   std::string tf_prefix = "";
-  if (params_.tf_frame_prefix_enable)
-  {
-    if (params_.tf_frame_prefix != "")
-    {
-      tf_prefix = params_.tf_frame_prefix;
-    }
-    else
-    {
-      tf_prefix = std::string(get_node()->get_namespace());
-    }
-
-    if (tf_prefix == "/")
-    {
-      tf_prefix = "";
-    }
-    else
-    {
-      tf_prefix = tf_prefix + "/";
-    }
+  if (params_.tf_frame_prefix_enable) {
+    if (params_.tf_frame_prefix != "") tf_prefix = params_.tf_frame_prefix;
+    else tf_prefix = std::string(get_node()->get_namespace());
+    
+    if (tf_prefix == "/") tf_prefix = "";
+    else tf_prefix = tf_prefix + "/";
   }
 
   const auto odom_frame_id = tf_prefix + params_.odom_frame_id;
@@ -378,8 +324,7 @@ controller_interface::CallbackReturn OmniDriveController::on_configure(
     geometry_msgs::msg::TwistWithCovariance(rosidl_runtime_cpp::MessageInitialization::ALL);
 
   constexpr size_t NUM_DIMENSIONS = 6;
-  for (size_t index = 0; index < 6; ++index)
-  {
+  for (size_t index = 0; index < 6; ++index) {
     // 0, 7, 14, 21, 28, 35
     const size_t diagonal_index = NUM_DIMENSIONS * index + index;
     odometry_message.pose.covariance[diagonal_index] = params_.pose_covariance_diagonal[index];
@@ -403,17 +348,13 @@ controller_interface::CallbackReturn OmniDriveController::on_configure(
   return controller_interface::CallbackReturn::SUCCESS;
 }
 
-controller_interface::CallbackReturn OmniDriveController::on_activate(const rclcpp_lifecycle::State &)
-{
+controller_interface::CallbackReturn OmniDriveController::on_activate(const rclcpp_lifecycle::State &) {
   const auto result = configure_wheels(params_.wheel_names, registered_wheel_handles_);
 
   if (result == controller_interface::CallbackReturn::ERROR) return controller_interface::CallbackReturn::ERROR;
   
-  if (registered_wheel_handles_.empty())
-  {
-    RCLCPP_ERROR(
-      get_node()->get_logger(),
-      "Either wheel interfaces are non existent");
+  if (registered_wheel_handles_.empty()) {
+    RCLCPP_ERROR(get_node()->get_logger(), "Either wheel interfaces are non existent");
     return controller_interface::CallbackReturn::ERROR;
   }
 
@@ -424,12 +365,9 @@ controller_interface::CallbackReturn OmniDriveController::on_activate(const rclc
   return controller_interface::CallbackReturn::SUCCESS;
 }
 
-controller_interface::CallbackReturn OmniDriveController::on_deactivate(
-  const rclcpp_lifecycle::State &)
-{
+controller_interface::CallbackReturn OmniDriveController::on_deactivate(const rclcpp_lifecycle::State &) {
   subscriber_is_active_ = false;
-  if (!is_halted)
-  {
+  if (!is_halted) {
     halt();
     is_halted = true;
   }
@@ -437,26 +375,18 @@ controller_interface::CallbackReturn OmniDriveController::on_deactivate(
   return controller_interface::CallbackReturn::SUCCESS;
 }
 
-controller_interface::CallbackReturn OmniDriveController::on_cleanup(
-  const rclcpp_lifecycle::State &)
-{
-  if (!reset())
-  {
-    return controller_interface::CallbackReturn::ERROR;
-  }
-
+controller_interface::CallbackReturn OmniDriveController::on_cleanup(const rclcpp_lifecycle::State &) {
+  if (!reset()) return controller_interface::CallbackReturn::ERROR;
   received_velocity_msg_ptr_.set(std::make_shared<Twist>());
   return controller_interface::CallbackReturn::SUCCESS;
 }
 
-controller_interface::CallbackReturn OmniDriveController::on_error(const rclcpp_lifecycle::State &)
-{
+controller_interface::CallbackReturn OmniDriveController::on_error(const rclcpp_lifecycle::State &) {
   if (!reset()) return controller_interface::CallbackReturn::ERROR;
   return controller_interface::CallbackReturn::SUCCESS;
 }
 
-bool OmniDriveController::reset()
-{
+bool OmniDriveController::reset() {
   odometry_.resetOdometry();
 
   // release the old queue
@@ -475,10 +405,8 @@ bool OmniDriveController::reset()
 
 controller_interface::CallbackReturn OmniDriveController::on_shutdown(const rclcpp_lifecycle::State &) { return controller_interface::CallbackReturn::SUCCESS; }
 
-void OmniDriveController::halt()
-{
-  const auto halt_wheels = [](auto & wheel_handles)
-  {
+void OmniDriveController::halt() {
+  const auto halt_wheels = [](auto & wheel_handles) {
     for (const auto & wheel_handle : wheel_handles) wheel_handle.velocity.get().set_value(0.0);
   };
 
@@ -487,45 +415,38 @@ void OmniDriveController::halt()
 
 controller_interface::CallbackReturn OmniDriveController::configure_wheels(
   const std::vector<std::string> & wheel_names,
-  std::vector<WheelHandle> & registered_handles)
-{
+  std::vector<WheelHandle> & registered_handles) {
   auto logger = get_node()->get_logger();
 
-  if (wheel_names.empty())
-  {
+  if (wheel_names.empty()) {
     RCLCPP_ERROR(logger, "No wheel names specified");
     return controller_interface::CallbackReturn::ERROR;
   }
 
   // register handles
   registered_handles.reserve(wheel_names.size());
-  for (const auto & wheel_name : wheel_names)
-  {
+  for (const auto & wheel_name : wheel_names) {
     const auto interface_name = feedback_type();
     const auto state_handle = std::find_if(
       state_interfaces_.cbegin(), state_interfaces_.cend(),
-      [&wheel_name, &interface_name](const auto & interface)
-      {
+      [&wheel_name, &interface_name](const auto & interface) {
         return interface.get_prefix_name() == wheel_name &&
                interface.get_interface_name() == interface_name;
       });
 
-    if (state_handle == state_interfaces_.cend())
-    {
+    if (state_handle == state_interfaces_.cend()) {
       RCLCPP_ERROR(logger, "Unable to obtain joint state handle for %s", wheel_name.c_str());
       return controller_interface::CallbackReturn::ERROR;
     }
 
     const auto command_handle = std::find_if(
       command_interfaces_.begin(), command_interfaces_.end(),
-      [&wheel_name](const auto & interface)
-      {
+      [&wheel_name](const auto & interface) {
         return interface.get_prefix_name() == wheel_name &&
                interface.get_interface_name() == HW_IF_VELOCITY;
       });
 
-    if (command_handle == command_interfaces_.end())
-    {
+    if (command_handle == command_interfaces_.end()) {
       RCLCPP_ERROR(logger, "Unable to obtain joint command handle for %s", wheel_name.c_str());
       return controller_interface::CallbackReturn::ERROR;
     }
@@ -539,6 +460,4 @@ controller_interface::CallbackReturn OmniDriveController::configure_wheels(
 }  // namespace omni_drive_controller
 
 #include "class_loader/register_macro.hpp"
-
-CLASS_LOADER_REGISTER_CLASS(
-  omni_drive_controller::OmniDriveController, controller_interface::ControllerInterface)
+CLASS_LOADER_REGISTER_CLASS(omni_drive_controller::OmniDriveController, controller_interface::ControllerInterface)
