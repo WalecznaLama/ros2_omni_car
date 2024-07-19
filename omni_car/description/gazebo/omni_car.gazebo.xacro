@@ -15,10 +15,10 @@
       <plugin filename="gz-sim-imu-system" name="gz::sim::systems::Imu"/>
 
       <!-- Force plugin (solution to the problem mecanum wheels) -->
-      <!-- <plugin filename="force_plugin" name="force_plugin::ForcePlugin">
+      <plugin filename="force_plugin" name="force_plugin::ForcePlugin">
         <bodyName>${prefix}base_link</bodyName>
         <cmdTopic>omni_drive_controller/cmd_vel_out</cmdTopic>
-      </plugin> -->
+      </plugin>
 
       <!-- /usr/share/gz/gz-sim8/worlds/mecanum_drive.sdf -->
       <!-- <plugin filename="gz-sim-mecanum-drive-system" name="gz::sim::systems::MecanumDrive">
