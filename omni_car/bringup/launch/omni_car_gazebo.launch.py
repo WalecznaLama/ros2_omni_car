@@ -5,7 +5,7 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import Command, FindExecutable, PathJoinSubstitution, LaunchConfiguration
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
-
+from launch.actions import TimerAction
 
 def generate_launch_description():
 
@@ -25,10 +25,26 @@ def generate_launch_description():
             description="Start rqt automatically with this launch file.",
         )
     )
+    declared_arguments.append(
+        DeclareLaunchArgument(
+            "joy",
+            default_value="false",
+            description="Start joy node automatically with this launch file.",
+        )
+    )
+    declared_arguments.append(
+        DeclareLaunchArgument(
+            "load_map",
+            default_value="false",
+            description="Start nav2_map_server node automatically with this launch file.",
+        )
+    )
 
     # Initialize Arguments
     arg_rviz = LaunchConfiguration("rviz")
     arg_rqt = LaunchConfiguration("rqt")
+    arg_joy = LaunchConfiguration("joy")
+    arg_load_map = LaunchConfiguration("load_map")
 
     # Get URDF via xacro
     robot_description_content = Command(
@@ -43,7 +59,6 @@ def generate_launch_description():
     ekf_config_file = PathJoinSubstitution([FindPackageShare("omni_car"), "config", "ekf.yaml"])
     rviz_config_file = PathJoinSubstitution([FindPackageShare("omni_car"), "rviz", "rviz.rviz"])
 
-    # gazebo
     gazebo = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([FindPackageShare("ros_gz_sim"), "/launch/gz_sim.launch.py"]),
         launch_arguments={"gz_args": " -r -v 3 empty.sdf"}.items(),  # -v verbose level, -r run immediately 
@@ -96,7 +111,6 @@ def generate_launch_description():
         arguments=["omni_drive_controller", "--controller-manager", "/controller_manager"],
     )
 
-    # Bridge
     bridge = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
@@ -107,6 +121,20 @@ def generate_launch_description():
                    '/depth_camera@sensor_msgs/msg/Image@gz.msgs.Image'
                    ],
         output='screen'
+    )
+
+    joy = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([FindPackageShare("omni_car"), "/launch/teleop_twist_joy.launch.py"]),
+        condition=IfCondition(arg_joy),
+    )
+
+    load_map = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([FindPackageShare("omni_car"), "/launch/map_server.launch.py"]),
+        condition=IfCondition(arg_load_map),
+    )
+    load_map_with_delay = TimerAction(
+        period=10.0,
+        actions=[load_map]
     )
 
     ekf = Node(
@@ -142,6 +170,8 @@ def generate_launch_description():
         joint_state_broadcaster_spawner,
         robot_controller_spawner,
         bridge,
+        joy,
+        load_map_with_delay,
         # ekf,
         rviz,
         rqt
