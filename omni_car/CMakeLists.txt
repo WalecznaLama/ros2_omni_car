@@ -27,8 +27,9 @@ endforeach()
 # INSTALL
 install(
   DIRECTORY description/launch description/ros2_control description/urdf description/gazebo description/rviz description/meshes
-            bringup/launch bringup/config
+            bringup/launch bringup/config bringup/maps
             worlds
+            
   DESTINATION share/omni_car
 )
 

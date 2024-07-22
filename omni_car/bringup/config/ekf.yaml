@@ -1,0 +1,24 @@
+ekf_filter_node:
+  ros__parameters:
+    frequency: 30  # Frequency at which the filter will run
+    sensor_timeout: 0.1  # Time before the sensor data is considered stale
+    two_d_mode: true  # If true, use 2D mode (ignores z-axis)
+    
+    odom0: /omni_drive_controller/odom  # Topic for odometry data
+    odom0_config: [true, true, true, false, false, false, true, true, true, false, false, false, false, false, false]  # Which components of the odometry to use
+    
+    imu0: /imu  # Topic for IMU data
+    imu0_config: [false, false, false, true, true, true, false, false, false, true, true, true]  # Which components of the IMU to use
+    imu0_differential: false  # Use differential mode for IMU
+    imu0_remove_gravitational_acceleration: true  # Remove gravitational acceleration from IMU data
+    
+    use_control: false  # If true, uses control input in the filter
+    stamped_control: false  # If true, uses stamped control input
+    
+    map_frame: map  # The coordinate frame attached to the map
+    odom_frame: odom  # The coordinate frame attached to the odometry
+    base_link_frame: base_link  # The coordinate frame attached to the robot base
+    world_frame: odom  # Use odom as the world coordinate frame
+
+    publish_tf: true  # If true, publishes a TF transform
+    print_diagnostics: true  # If true, prints diagnostic messages

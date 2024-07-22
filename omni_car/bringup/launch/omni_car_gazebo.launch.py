@@ -40,6 +40,7 @@ def generate_launch_description():
     robot_description = {"robot_description": robot_description_content}
 
     world_sdf_file = PathJoinSubstitution([FindPackageShare("omni_car"), "gazebo", "world.sdf"])
+    ekf_config_file = PathJoinSubstitution([FindPackageShare("omni_car"), "config", "ekf.yaml"])
     rviz_config_file = PathJoinSubstitution([FindPackageShare("omni_car"), "rviz", "rviz.rviz"])
 
     # gazebo
@@ -108,6 +109,14 @@ def generate_launch_description():
         output='screen'
     )
 
+    ekf = Node(
+        package='robot_localization',
+        executable='ekf_node',
+        name='ekf_filter_node',
+        output='screen',
+        parameters=[ekf_config_file],
+    )
+
     rviz = Node(
         package="rviz2",
         executable="rviz2",
@@ -133,6 +142,7 @@ def generate_launch_description():
         joint_state_broadcaster_spawner,
         robot_controller_spawner,
         bridge,
+        # ekf,
         rviz,
         rqt
     ]
