@@ -5,7 +5,6 @@ from launch_ros.actions import Node
 import launch_ros.actions
 
 def generate_launch_description():
-    ld = LaunchDescription()
 
     # Define the path to the map file
     map_server_config_path = os.path.join(get_package_share_directory('omni_car'), 'maps', 'map.yaml')
@@ -15,6 +14,7 @@ def generate_launch_description():
         package='nav2_map_server',
         executable='map_server',
         output='screen',
+        emulate_tty=True,  # https://github.com/ros2/launch/issues/188
         parameters=[{'yaml_filename': map_server_config_path}]
     )
 
@@ -33,7 +33,7 @@ def generate_launch_description():
                         {'node_names': lifecycle_nodes}]
     )
     
-    # Add actions to the launch description
+    ld = LaunchDescription()
     ld.add_action(map_server_cmd)
     ld.add_action(start_lifecycle_manager_cmd)
 

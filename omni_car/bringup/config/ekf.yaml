@@ -1,6 +1,6 @@
 ekf_filter_node:
   ros__parameters:
-    frequency: 30  # Frequency at which the filter will run
+    frequency: 10.  # Frequency at which the filter will run
     sensor_timeout: 0.1  # Time before the sensor data is considered stale
     two_d_mode: true  # If true, use 2D mode (ignores z-axis)
     

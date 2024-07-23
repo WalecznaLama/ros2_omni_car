@@ -144,6 +144,10 @@ def generate_launch_description():
         output='screen',
         parameters=[ekf_config_file],
     )
+    ekf_with_delay = TimerAction(
+        period=15.0,
+        actions=[ekf]
+    )
 
     rviz = Node(
         package="rviz2",
@@ -172,7 +176,7 @@ def generate_launch_description():
         bridge,
         joy,
         load_map_with_delay,
-        # ekf,
+        ekf_with_delay,
         rviz,
         rqt
     ]

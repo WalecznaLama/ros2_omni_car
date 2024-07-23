@@ -30,7 +30,7 @@ install(
             bringup/launch bringup/config 
             worlds
             maps
-  DESTINATION share/omni_car
+  DESTINATION share/${PROJECT_NAME}
 )
 
 ## GZ PLUGIN
