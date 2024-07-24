@@ -39,12 +39,20 @@ def generate_launch_description():
             description="Start nav2_map_server node automatically with this launch file.",
         )
     )
+    declared_arguments.append(
+        DeclareLaunchArgument(
+            "navigation",
+            default_value="false",
+            description="Start navigation node automatically with this launch file.",
+        )
+    )
 
     # Initialize Arguments
     arg_rviz = LaunchConfiguration("rviz")
     arg_rqt = LaunchConfiguration("rqt")
     arg_joy = LaunchConfiguration("joy")
     arg_load_map = LaunchConfiguration("load_map")
+    arg_navigation = LaunchConfiguration("navigation")
 
     # Get URDF via xacro
     robot_description_content = Command(
@@ -137,6 +145,15 @@ def generate_launch_description():
         actions=[load_map]
     )
 
+    navigation = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([FindPackageShare("omni_car"), "/launch/navigation.launch.py"]),
+        condition=IfCondition(arg_navigation),
+    )
+    navigation_with_delay = TimerAction(
+        period=15.0,
+        actions=[navigation]
+    )
+
     ekf = Node(
         package='robot_localization',
         executable='ekf_node',
@@ -176,6 +193,7 @@ def generate_launch_description():
         bridge,
         joy,
         load_map_with_delay,
+        navigation_with_delay,
         ekf_with_delay,
         rviz,
         rqt

@@ -204,7 +204,7 @@ Visualization Manager:
           Scale: 1
           Value: true
         Value: true
-      Enabled: false
+      Enabled: true
       Keep: 20
       Name: Odometry
       Position Tolerance: 0.10000000149011612
@@ -224,8 +224,8 @@ Visualization Manager:
         Filter size: 10
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /omni_drive_controller/odom
-      Value: false
+        Value: /odometry/filtered
+      Value: true
     - Alpha: 0.699999988079071
       Binary representation: false
       Binary threshold: 100
@@ -295,7 +295,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 2.689328193664551
+      Distance: 2.29272198677063
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -331,5 +331,5 @@ Window Geometry:
   Views:
     collapsed: true
   Width: 1200
-  X: 2207
-  Y: 335
+  X: 3549
+  Y: 304
