@@ -32,9 +32,19 @@ def generate_launch_description():
                         {'autostart': autostart},
                         {'node_names': lifecycle_nodes}]
     )
-    
+
+    # Node to publish the static transform between map and odom
+    static_transform_publisher_cmd = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        name='static_transform_publisher',
+        output='screen',
+        arguments=['0', '0', '0', '0', '0', '0', 'map', 'odom']
+    )
+
     ld = LaunchDescription()
     ld.add_action(map_server_cmd)
     ld.add_action(start_lifecycle_manager_cmd)
+    # ld.add_action(static_transform_publisher_cmd)
 
     return ld

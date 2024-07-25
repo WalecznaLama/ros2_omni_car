@@ -140,10 +140,6 @@ def generate_launch_description():
         PythonLaunchDescriptionSource([FindPackageShare("omni_car"), "/launch/map_server.launch.py"]),
         condition=IfCondition(arg_load_map),
     )
-    load_map_with_delay = TimerAction(
-        period=10.0,
-        actions=[load_map]
-    )
 
     navigation = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([FindPackageShare("omni_car"), "/launch/navigation.launch.py"]),
@@ -162,7 +158,7 @@ def generate_launch_description():
         parameters=[ekf_config_file],
     )
     ekf_with_delay = TimerAction(
-        period=15.0,
+        period=10.0,
         actions=[ekf]
     )
 
@@ -174,7 +170,10 @@ def generate_launch_description():
         arguments=["-d", rviz_config_file],
         condition=IfCondition(arg_rviz),
     )
-
+    rviz_with_delay = TimerAction(
+        period=5.0,
+        actions=[rviz]
+    )
     rqt = Node(
         package='rqt_image_view',
         executable='rqt_image_view',
@@ -192,10 +191,10 @@ def generate_launch_description():
         robot_controller_spawner,
         bridge,
         joy,
-        load_map_with_delay,
+        load_map,
         navigation_with_delay,
         ekf_with_delay,
-        rviz,
+        rviz_with_delay,
         rqt
     ]
 
